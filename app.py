@@ -5,19 +5,28 @@ import os
 app = Flask(__name__)
 
 conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-queue = QueueClient.from_connection_string(conn_str, "demo-queue")
+queue_name = "demo-queue"
+queue = QueueClient.from_connection_string(conn_str, queue_name)
+
+FAIL_MODE = False
 
 @app.route("/")
 def index():
     props = queue.get_queue_properties()
     count = props.approximate_message_count
     messages = queue.peek_messages(10)
-    return render_template("index.html", count=count, messages=messages)
+    return render_template("index.html", count=count, messages=messages, fail=FAIL_MODE)
 
 @app.route("/add", methods=["POST"])
 def add():
     msg = request.form.get("message")
     queue.send_message(msg)
+    return redirect("/")
+
+@app.route("/toggle-fail")
+def toggle_fail():
+    global FAIL_MODE
+    FAIL_MODE = not FAIL_MODE
     return redirect("/")
 
 if __name__ == "__main__":
