@@ -1,21 +1,24 @@
-<!DOCTYPE html>
-<html>
-<body>
-<h2>Azure Queue Lab</h2>
+from flask import Flask, request, render_template, redirect
+from azure.storage.queue import QueueClient
+import os
 
-<p>Queue Count: {{ count }}</p>
+app = Flask(__name__)
 
-<form action="/add" method="post">
-  <input name="message" placeholder="Enter message">
-  <button type="submit">Add</button>
-</form>
+conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+queue = QueueClient.from_connection_string(conn_str, "demo-queue")
 
-<h3>Messages (peek)</h3>
-<ul>
-{% for m in messages %}
-  <li>{{ m.content }}</li>
-{% endfor %}
-</ul>
+@app.route("/")
+def index():
+    props = queue.get_queue_properties()
+    count = props.approximate_message_count
+    messages = queue.peek_messages(10)
+    return render_template("index.html", count=count, messages=messages)
 
-</body>
-</html>
+@app.route("/add", methods=["POST"])
+def add():
+    msg = request.form.get("message")
+    queue.send_message(msg)
+    return redirect("/")
+
+if __name__ == "__main__":
+    app.run()
