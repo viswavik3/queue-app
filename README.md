@@ -1,24 +1,36 @@
-from flask import Flask, request, render_template, redirect
-from azure.storage.queue import QueueClient
-import os
 
-app = Flask(__name__)
+# Azure Storage Queue Lab
 
-conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-queue = QueueClient.from_connection_string(conn_str, "demo-queue")
+## What this does
+- Web UI to add + view queue messages
+- Worker to process messages
+- Simulates:
+  - Visibility timeout
+  - Retries
+  - Duplicate processing
 
-@app.route("/")
-def index():
-    props = queue.get_queue_properties()
-    count = props.approximate_message_count
-    messages = queue.peek_messages(10)
-    return render_template("index.html", count=count, messages=messages)
+## Setup
 
-@app.route("/add", methods=["POST"])
-def add():
-    msg = request.form.get("message")
-    queue.send_message(msg)
-    return redirect("/")
+1. Create Azure Storage Queue
+2. Set environment variable:
+   AZURE_STORAGE_CONNECTION_STRING
 
-if __name__ == "__main__":
-    app.run()
+## Run locally
+
+### Web app
+python app.py
+
+### Worker
+python worker.py
+
+## Deploy to Azure App Service
+
+zip files and deploy using:
+az webapp deployment source config-zip --src app.zip
+
+## Test scenarios
+
+- Normal: add message → processed → deleted
+- Failure: add "fail-test" → retries happen
+- Stop worker → queue builds
+
