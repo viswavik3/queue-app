@@ -1,8 +1,9 @@
 from azure.storage.queue import QueueClient
 import os, time
 
-conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-queue = QueueClient.from_connection_string(conn_str, "demo-queue")
+def get_queue():
+    conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    return QueueClient.from_connection_string(conn_str, "demo-queue")
 
 while True:
     messages = queue.receive_messages(messages_per_page=1, visibility_timeout=10)
