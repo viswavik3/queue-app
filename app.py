@@ -10,6 +10,7 @@ queue = QueueClient.from_connection_string(conn_str, queue_name)
 
 @app.route("/")
 def index():
+    queue = get_queue()
     props = queue.get_queue_properties()
     count = props.approximate_message_count
     messages = list(queue.peek_messages(10))
