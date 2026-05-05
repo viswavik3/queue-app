@@ -2,23 +2,20 @@
 <html>
 <body>
 
-<h2>Azure Queue Full Lab</h2>
+<h2>Azure Queue Lab (Fixed)</h2>
 
 <p>Queue Count: {{ count }}</p>
 
-<h3>Add Message</h3>
 <form action="/add" method="post">
 <input name="message" placeholder="hello / fail / slow">
 <button type="submit">Add</button>
 </form>
 
-<h3>Bulk Add</h3>
 <form action="/bulk" method="post">
 <input name="count" placeholder="10">
-<button type="submit">Add Bulk</button>
+<button type="submit">Bulk Add</button>
 </form>
 
-<h3>Peek Messages</h3>
 <ul>
 {% for m in messages %}
 <li>{{ m.content }}</li>

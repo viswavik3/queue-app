@@ -1,9 +1,14 @@
 from azure.storage.queue import QueueClient
 import os, time
 
-def get_queue():
-    conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    return QueueClient.from_connection_string(conn_str, "demo-queue")
+def get_conn_str():
+    return os.getenv("AZURE_STORAGE_CONNECTION_STRING") or os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+
+conn_str = get_conn_str()
+if not conn_str:
+    raise Exception("Missing connection string")
+
+queue = QueueClient.from_connection_string(conn_str, "demo-queue")
 
 while True:
     messages = queue.receive_messages(messages_per_page=1, visibility_timeout=10)
@@ -12,12 +17,10 @@ while True:
         print(f"Processing: {msg.content}, DequeueCount: {msg.dequeue_count}")
 
         if "fail" in msg.content:
-            print("Simulating failure")
             time.sleep(15)
             continue
 
         if "slow" in msg.content:
-            print("Simulating slow processing")
             time.sleep(12)
 
         time.sleep(2)
