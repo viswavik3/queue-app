@@ -1,36 +1,47 @@
+# Azure Storage Queue Full Lab
 
-# Azure Storage Queue Lab
+## What this lab covers
 
-## What this does
-- Web UI to add + view queue messages
-- Worker to process messages
-- Simulates:
-  - Visibility timeout
-  - Retries
-  - Duplicate processing
+- Enqueue / Dequeue
+- Visibility timeout
+- Retry behavior
+- Duplicate processing
+- Queue buffering
+- Slow processing impact
 
 ## Setup
 
-1. Create Azure Storage Queue
-2. Set environment variable:
-   AZURE_STORAGE_CONNECTION_STRING
+Set environment variable:
+
+AZURE_STORAGE_CONNECTION_STRING
 
 ## Run locally
 
-### Web app
+Web UI:
 python app.py
 
-### Worker
+Worker:
 python worker.py
 
-## Deploy to Azure App Service
+## Test Scenarios
 
-zip files and deploy using:
+1. Normal:
+   hello
+
+2. Failure:
+   fail-test
+
+3. Slow processing:
+   slow-task
+
+4. Bulk load:
+   Add 50 messages
+
+5. Duplicate:
+   Run 2 workers
+
+## Deploy
+
+zip and deploy:
+
 az webapp deployment source config-zip --src app.zip
-
-## Test scenarios
-
-- Normal: add message → processed → deleted
-- Failure: add "fail-test" → retries happen
-- Stop worker → queue builds
-

@@ -1,6 +1,5 @@
 from azure.storage.queue import QueueClient
-import os
-import time
+import os, time
 
 conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 queue = QueueClient.from_connection_string(conn_str, "demo-queue")
@@ -11,17 +10,17 @@ while True:
     for msg in messages:
         print(f"Processing: {msg.content}, DequeueCount: {msg.dequeue_count}")
 
-        # Simulate failure for specific messages
         if "fail" in msg.content:
-            print("Simulating failure...")
-            time.sleep(15)  # exceed visibility timeout
+            print("Simulating failure")
+            time.sleep(15)
             continue
 
-        # Simulate processing
-        time.sleep(3)
+        if "slow" in msg.content:
+            print("Simulating slow processing")
+            time.sleep(12)
 
-        # Delete after success
+        time.sleep(2)
         queue.delete_message(msg.id, msg.pop_receipt)
-        print("Deleted message")
+        print("Deleted")
 
-    time.sleep(2)
+    time.sleep(1)
