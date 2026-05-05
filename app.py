@@ -4,25 +4,18 @@ import os
 
 app = Flask(__name__)
 
-def get_conn_str():
-    # support both names to avoid mismatch issues
-    return os.getenv("AZURE_STORAGE_CONNECTION_STRING") or os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-
 def get_queue():
-    conn_str = get_conn_str()
+    conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     if not conn_str:
-        raise Exception("Missing connection string. Check App Service settings.")
+        raise Exception("Missing AZURE_STORAGE_CONNECTION_STRING")
     return QueueClient.from_connection_string(conn_str, "demo-queue")
 
 @app.route("/")
 def index():
-    try:
-        queue = get_queue()
-        props = queue.get_queue_properties()
-        count = props.approximate_message_count
-        messages = list(queue.peek_messages(10))
-    except Exception as e:
-        return f"Error: {str(e)}"
+    queue = get_queue()
+    props = queue.get_queue_properties()
+    count = props.approximate_message_count
+    messages = list(queue.peek_messages(10))
     return render_template("index.html", count=count, messages=messages)
 
 @app.route("/add", methods=["POST"])

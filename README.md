@@ -1,20 +1,28 @@
-# Azure Queue Fixed Lab
+# Azure Queue WebJob Lab
 
-## Key Fixes
-- No queue initialization at startup
-- Safe env variable handling
-- Prevents App Service crash
+## What this includes
+- Flask Web App (UI)
+- Azure Storage Queue integration
+- Continuous WebJob worker
 
-## IMPORTANT
-Set ONE of these in App Service:
+## Setup
 
+1. Create queue:
+az storage queue create --name demo-queue --account-name <your-storage>
+
+2. Set env var in App Service:
 AZURE_STORAGE_CONNECTION_STRING
-
-## Run
-
-python app.py
-python worker.py
 
 ## Deploy
 
-az webapp deployment source config-zip --src azure_queue_fixed_lab.zip
+az webapp deployment source config-zip --src azure_queue_webjob_lab.zip
+
+## Verify
+
+Go to App Service → WebJobs
+Check "queue-worker" is running
+
+## Test
+
+- Add message in UI
+- Check WebJob logs
